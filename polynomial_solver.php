@@ -68,21 +68,25 @@ function gaussianElimination(array $matrix, array $values): array {
     return $x;
 }
 
-// Read the JSON input file (make sure this file exists)
-$json = file_get_contents('testcase.json');
-$data = json_decode($json, true);
+// MAIN CODE
 
+// Get filename from command line or default
+$filename = $argv[1] ?? 'testcase.json';
+
+$json = file_get_contents($filename);
+if ($json === false) {
+    die("Error: Could not open file '$filename'\n");
+}
+
+$data = json_decode($json, true);
 if ($data === null) {
     die("Invalid JSON input or file not found\n");
 }
 
-// Extract keys n and k
 $n = intval($data['keys']['n']);
 $k = intval($data['keys']['k']);
 $m = $k - 1; // degree of polynomial
 
-// Prepare arrays for x and y values
-// Assume x = 1, 2, ..., k for roots to build Vandermonde matrix
 $x_vals = [];
 $y_vals = [];
 
@@ -98,7 +102,6 @@ for ($i = 1; $i <= $k; $i++) {
     $y_vals[] = $decimal;
 }
 
-// Build Vandermonde matrix (k x k)
 $V = [];
 for ($i = 0; $i < $k; $i++) {
     $row = [];
@@ -108,7 +111,6 @@ for ($i = 0; $i < $k; $i++) {
     $V[] = $row;
 }
 
-// Solve system for coefficients
 $coefficients = gaussianElimination($V, $y_vals);
 
 // Print polynomial coefficients
